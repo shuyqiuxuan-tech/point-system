@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Points Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --crimson: #8B0000;
+    --crimson-mid: #A52020;
+    --crimson-light: #C0392B;
+    --crimson-pale: #F9ECEC;
+    --crimson-border: #E8C4C4;
+    --white: #FFFFFF;
+    --off-white: #FAFAFA;
+    --text-dark: #1A1A1A;
+    --text-mid: #555555;
+    --text-muted: #888888;
+    --gold: #C9972B;
+    --silver: #8A9BAC;
+    --bronze: #A0672A;
+    --shadow: 0 2px 16px rgba(139,0,0,0.08);
+    --shadow-lg: 0 8px 32px rgba(139,0,0,0.12);
+  }
+
+  body {
+    font-family: 'Roboto', sans-serif;
+    background: var(--white);
+    color: var(--text-dark);
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  header {
+    background: var(--crimson);
+    padding: 0;
+  }
+  .header-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 28px 24px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .header-icon {
+    width: 44px; height: 44px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+  }
+  .header-text h1 {
+    font-size: 22px; font-weight: 700; color: #fff; letter-spacing: 0.3px;
+  }
+  .header-text p {
+    font-size: 13px; color: rgba(255,255,255,0.65); margin-top: 2px;
+  }
+
+  /* ── Main layout ── */
+  .page {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 36px 24px 60px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    align-items: start;
+  }
+
+  /* ── Panel base ── */
+  .panel {
+    background: var(--white);
+    border: 1px solid var(--crimson-border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .panel-header {
+    background: var(--crimson-pale);
+    border-bottom: 1px solid var(--crimson-border);
+    padding: 16px 20px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .panel-header-icon { font-size: 18px; }
+  .panel-header h2 {
+    font-size: 14px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.8px; color: var(--crimson);
+  }
+  .panel-body { padding: 20px; }
+
+  /* ── Search panel ── */
+  .search-row {
+    display: flex; gap: 10px;
+  }
+  .search-row input {
+    flex: 1;
+    font-family: 'Roboto', sans-serif;
+    font-size: 15px;
+    padding: 11px 14px;
+    border: 1.5px solid var(--crimson-border);
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s;
+    color: var(--text-dark);
+    background: var(--white);
+  }
+  .search-row input:focus { border-color: var(--crimson); }
+  .search-row input::placeholder { color: var(--text-muted); }
+  .btn-search {
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px; font-weight: 700;
+    background: var(--crimson);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 11px 20px;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+    transition: background 0.2s;
+  }
+  .btn-search:hover { background: var(--crimson-light); }
+
+  /* ── Result card ── */
+  #result { margin-top: 20px; display: none; }
+
+  .agent-name {
+    font-size: 20px; font-weight: 700; color: var(--crimson);
+    margin-bottom: 4px;
+  }
+  .agent-id-label {
+    font-size: 12px; color: var(--text-muted); text-transform: uppercase;
+    letter-spacing: 0.6px; margin-bottom: 16px;
+  }
+
+  /* Points breakdown */
+  .breakdown {
+    background: var(--crimson-pale);
+    border-radius: 10px;
+    padding: 18px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid var(--crimson-border);
+  }
+  .breakdown-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    width: 100%;
+  }
+  .bd-col {
+    flex: 1;
+    text-align: center;
+    padding: 0 8px;
+  }
+  .bd-pts {
+    font-size: 22px; font-weight: 900;
+    color: var(--crimson);
+    line-height: 1;
+  }
+  .bd-pts.green { color: #2E7D32; }
+  .bd-label {
+    font-size: 12px; color: var(--text-mid); margin-top: 3px;
+  }
+  .bd-plus {
+    font-size: 20px; font-weight: 300; color: var(--text-muted);
+    padding: 0 4px;
+    align-self: flex-start;
+    margin-top: 4px;
+  }
+  .bd-eq {
+    font-size: 18px; font-weight: 300; color: var(--text-muted);
+    padding: 0 4px;
+    align-self: flex-start;
+    margin-top: 6px;
+  }
+  .bd-divider {
+    width: 100%;
+    border: none;
+    border-top: 1px solid var(--crimson-border);
+    margin: 6px 0;
+  }
+  .bd-total-row {
+    width: 100%;
+    text-align: center;
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 8px;
+  }
+  .bd-total-num {
+    font-size: 34px; font-weight: 900;
+    color: var(--crimson);
+    line-height: 1;
+  }
+  .bd-total-label {
+    font-size: 13px; font-weight: 500; color: var(--text-mid);
+  }
+
+  .rank-badge {
+    margin-top: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--crimson);
+    color: #fff;
+    font-size: 12px; font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 20px;
+    letter-spacing: 0.3px;
+  }
+
+  .not-found {
+    text-align: center; padding: 20px 0;
+    color: var(--text-muted); font-size: 14px;
+  }
+  .not-found span { font-size: 28px; display: block; margin-bottom: 8px; }
+
+  /* ── Leaderboard ── */
+  .lb-row {
+    display: flex;
+    align-items: center;
+    padding: 11px 16px;
+    border-bottom: 1px solid #F0E0E0;
+    gap: 12px;
+    transition: background 0.15s;
+  }
+  .lb-row:last-child { border-bottom: none; }
+  .lb-row:hover { background: var(--crimson-pale); }
+  .lb-row.highlighted {
+    background: var(--crimson-pale);
+    border-left: 3px solid var(--crimson);
+    padding-left: 13px;
+  }
+
+  .rank-num {
+    width: 28px; text-align: center;
+    font-size: 13px; font-weight: 700; color: var(--text-muted);
+    flex-shrink: 0;
+  }
+  .rank-num.gold   { color: var(--gold); font-size: 18px; }
+  .rank-num.silver { color: var(--silver); font-size: 17px; }
+  .rank-num.bronze { color: var(--bronze); font-size: 16px; }
+
+  .lb-name {
+    flex: 1;
+    font-size: 14px; font-weight: 500;
+    color: var(--text-dark);
+  }
+  .lb-name.hidden-name {
+    color: var(--text-muted);
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .lb-score {
+    font-size: 15px; font-weight: 700;
+    color: var(--crimson);
+    flex-shrink: 0;
+  }
+  .lb-score-label {
+    font-size: 11px; font-weight: 400; color: var(--text-muted);
+  }
+
+  /* Leaderboard note */
+  .lb-note {
+    padding: 10px 16px;
+    background: var(--crimson-pale);
+    border-top: 1px solid var(--crimson-border);
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  /* Mobile */
+  @media (max-width: 680px) {
+    .page { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-icon">🏆</div>
+    <div class="header-text">
+      <h1>Agent Points Portal</h1>
+      <p>Check your score and see where you rank</p>
+    </div>
+  </div>
+</header>
+
+<div class="page">
+
+  <!-- Left: Search + Result -->
+  <div>
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-header-icon">🔍</span>
+        <h2>My Points</h2>
+      </div>
+      <div class="panel-body">
+        <div class="search-row">
+          <input type="text" id="agentInput" placeholder="Enter your Agent ID…" maxlength="10">
+          <button class="btn-search" onclick="lookupAgent()">Check</button>
+        </div>
+
+        <div id="result">
+          <!-- filled by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Leaderboard -->
+  <div>
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-header-icon">📊</span>
+        <h2>Top 10 Leaderboard</h2>
+      </div>
+      <div id="leaderboard-list">
+        <!-- filled by JS -->
+      </div>
+      <div class="lb-note" id="lb-note">Search your ID to reveal your name if you're in the top 10.</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── Data from Point Bank table ──
+const agents = [
+  { id: "1111",  name: "Karwai",  boost: 3,  superboost: 20 },
+  { id: "2222",  name: "Yik Ken", boost: 4,  superboost: 16 },
+  { id: "3333",  name: "Rainier", boost: 7,  superboost: 12 },
+  { id: "4444",  name: "Nicole",  boost: 6,  superboost: 8  },
+  { id: "5555",  name: "Adrian",  boost: 10, superboost: 8  },
+  { id: "6666",  name: "Eza",     boost: 11, superboost: 6  },
+  { id: "7777",  name: "Pam",     boost: 9,  superboost: 2  },
+  { id: "8888",  name: "Agent F", boost: 5,  superboost: 10 },
+  { id: "9999",  name: "Agent B", boost: 3,  superboost: 8  },
+  { id: "11111", name: "Agent C", boost: 2,  superboost: 14 },
+  { id: "22222", name: "Agent D", boost: 1,  superboost: 4  },
+  { id: "33333", name: "Agent E", boost: 9,  superboost: 16 },
+  { id: "44444", name: "Agent F", boost: 6,  superboost: 8  },
+  { id: "55555", name: "Agent G", boost: 2,  superboost: 6  },
+  { id: "66666", name: "Agent H", boost: 3,  superboost: 10 },
+  { id: "77777", name: "Agent I", boost: 0,  superboost: 6  },
+  { id: "88888", name: "Agent J", boost: 12, superboost: 0  },
+];
+
+// Compute total: boost×1 + superboost×2
+agents.forEach(a => {
+  a.boostPts      = a.boost;
+  a.superboostPts = a.superboost * 2;
+  a.total         = a.boostPts + a.superboostPts;
+});
+
+// Sort descending
+const sorted = [...agents].sort((a, b) => b.total - a.total);
+const top10  = sorted.slice(0, 10);
+
+// State
+let revealedId = null;
+
+// ── Render leaderboard ──
+function renderLeaderboard() {
+  const list = document.getElementById('leaderboard-list');
+  const medals = ['🥇','🥈','🥉'];
+  const medalClass = ['gold','silver','bronze'];
+
+  list.innerHTML = top10.map((a, i) => {
+    const rank = i + 1;
+    const isMe = revealedId && a.id === revealedId;
+    const showName = isMe; // only reveal your own name
+
+    const rankDisplay = rank <= 3
+      ? `<span class="rank-num ${medalClass[i]}">${medals[i]}</span>`
+      : `<span class="rank-num">${rank}</span>`;
+
+    const nameDisplay = showName
+      ? `<span class="lb-name">${a.name} <span style="font-size:11px;color:var(--crimson);font-weight:700">(You)</span></span>`
+      : `<span class="lb-name hidden-name">Agent #${rank}</span>`;
+
+    return `
+      <div class="lb-row ${isMe ? 'highlighted' : ''}">
+        ${rankDisplay}
+        ${nameDisplay}
+        <div style="text-align:right">
+          <div class="lb-score">${a.total}</div>
+          <div class="lb-score-label">pts</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── Lookup agent ──
+function lookupAgent() {
+  const input = document.getElementById('agentInput').value.trim();
+  const result = document.getElementById('result');
+  const note = document.getElementById('lb-note');
+
+  if (!input) return;
+
+  const agent = agents.find(a => a.id === input);
+  revealedId = agent ? agent.id : null;
+
+  if (!agent) {
+    result.style.display = 'block';
+    result.innerHTML = `
+      <div class="not-found">
+        <span>🔎</span>
+        No agent found with ID <strong>${input}</strong>.<br>
+        Please check your ID and try again.
+      </div>`;
+    renderLeaderboard();
+    note.textContent = 'Search your ID to reveal your name if you're in the top 10.';
+    return;
+  }
+
+  // Find rank
+  const rankIdx = top10.findIndex(a => a.id === agent.id);
+  const rankDisplay = rankIdx >= 0
+    ? `<div class="rank-badge">🏆 Rank #${rankIdx + 1} in Top 10</div>`
+    : (() => {
+        const fullRank = sorted.findIndex(a => a.id === agent.id) + 1;
+        return `<div class="rank-badge" style="background:var(--text-muted)">Rank #${fullRank} overall</div>`;
+      })();
+
+  result.style.display = 'block';
+  result.innerHTML = `
+    <div class="agent-name">${agent.name}</div>
+    <div class="agent-id-label">ID: ${agent.id}</div>
+
+    <div class="breakdown">
+      <div class="breakdown-row">
+        <div class="bd-col">
+          <div class="bd-pts">+${agent.boostPts}</div>
+          <div class="bd-label">${agent.boost} Boost${agent.boost !== 1 ? 's' : ''}</div>
+        </div>
+        <div class="bd-plus">+</div>
+        <div class="bd-col">
+          <div class="bd-pts">+${agent.superboostPts}</div>
+          <div class="bd-label">${agent.superboost} SuperBoost${agent.superboost !== 1 ? 's' : ''}</div>
+        </div>
+        <div class="bd-eq">=</div>
+        <div class="bd-col">
+          <div class="bd-pts green">${agent.total}</div>
+          <div class="bd-label">Total pts</div>
+        </div>
+      </div>
+      <hr class="bd-divider">
+      <div class="bd-total-row">
+        <div class="bd-total-num">${agent.total}</div>
+        <div class="bd-total-label">Total Points</div>
+      </div>
+    </div>
+
+    ${rankDisplay}
+  `;
+
+  renderLeaderboard();
+
+  if (rankIdx >= 0) {
+    note.textContent = `You're in the top 10! Your name is now visible in the leaderboard.`;
+  } else {
+    note.textContent = 'Keep going — you need more points to crack the top 10!';
+  }
+}
+
+// Enter key support
+document.getElementById('agentInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') lookupAgent();
+});
+
+// Initial render
+renderLeaderboard();
+</script>
+</body>
+</html>
